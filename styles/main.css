@@ -58,7 +58,15 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
 .card-caption { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; line-height: 1.4; }
 .card-caption h2 { font-size: 17px; font-weight: 400; letter-spacing: -.02em; }
 .card-caption > span { color: var(--muted); font-size: 14px; white-space: nowrap; }
-.card-caption > span span { margin-left: 12px; }
+.arrow-icon { display: inline-block; vertical-align: -.15em; flex-shrink: 0; }
+.card-caption > span .arrow-icon { margin-left: 12px; }
+/* Старые страницы из кеша: вместо символа тоже рисуем векторную стрелку. */
+.card-caption > span > span[aria-hidden="true"] {
+  display: inline-block; width: 16px; height: 16px; margin-left: 12px;
+  font-size: 0; vertical-align: -.15em; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18 18 6M6 6h12v12' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18 18 6M6 6h12v12' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 .project-card a:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
 .site-footer { border-top: 1px solid var(--line); margin-top: 65px; padding: 22px 0 28px; display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font-size: 12px; }
 .project-intro { padding: 40px 0 55px; }
@@ -89,7 +97,8 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
   .card-caption { flex-direction: row; padding-top: 12px; }
   .card-caption h2 { font-size: 16px; }
   .card-caption > span { font-size: 13px; }
-  .card-caption > span span { margin-left: 4px; }
+  .card-caption > span .arrow-icon { margin-left: 4px; }
+  .card-caption > span > span[aria-hidden="true"] { margin-left: 4px; }
   .site-footer { font-size: 11px; }
   .project-intro { padding: 25px 0 30px; }
   .project-heading { grid-template-columns: minmax(0, 1fr); gap: 25px; margin-top: 32px; }
