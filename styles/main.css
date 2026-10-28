@@ -55,15 +55,15 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
 .project-card a:hover .preview-indicators, .project-card a:focus-visible .preview-indicators { opacity: 1; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (hover: none) { .preview-indicators { opacity: 1; } }
-.card-caption { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; line-height: 1.4; }
+.card-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 15px; line-height: 1.4; }
 .card-caption h2 { font-size: 17px; font-weight: 400; letter-spacing: -.02em; }
-.card-caption > span { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.card-caption > span { display: inline-flex; align-items: center; flex-shrink: 0; gap: 8px; color: var(--muted); font-size: 14px; white-space: nowrap; }
 .arrow-icon { display: inline-block; vertical-align: -.15em; flex-shrink: 0; }
-.card-caption > span .arrow-icon { margin-left: 12px; }
+.card-caption > span .arrow-icon { display: block; width: 16px; height: 16px; }
 /* Старые страницы из кеша: вместо символа тоже рисуем векторную стрелку. */
 .card-caption > span > span[aria-hidden="true"] {
-  display: inline-block; width: 16px; height: 16px; margin-left: 12px;
-  font-size: 0; vertical-align: -.15em; background: currentColor;
+  display: block; width: 16px; height: 16px; flex-shrink: 0;
+  font-size: 0; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18 18 6M6 6h12v12' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 18 18 6M6 6h12v12' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
@@ -97,8 +97,7 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
   .card-caption { flex-direction: row; padding-top: 12px; }
   .card-caption h2 { font-size: 16px; }
   .card-caption > span { font-size: 13px; }
-  .card-caption > span .arrow-icon { margin-left: 4px; }
-  .card-caption > span > span[aria-hidden="true"] { margin-left: 4px; }
+  .card-caption > span { gap: 6px; }
   .site-footer { font-size: 11px; }
   .project-intro { padding: 25px 0 30px; }
   .project-heading { grid-template-columns: minmax(0, 1fr); gap: 25px; margin-top: 32px; }
