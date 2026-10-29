@@ -14,6 +14,16 @@ for (const frame of document.querySelectorAll('.project-card .cover[data-preview
   let wanted = 0;
   let gesture = null;
   let suppressClick = false;
+  let fade = null;
+  const reducedMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function stopFade() {
+    if (!fade) return;
+    const previous = fade;
+    fade = null;
+    previous.animation.cancel();
+    previous.layer.remove();
+  }
+  reducedMotion?.addEventListener('change', () => { if (reducedMotion.matches) stopFade(); });
   const loaded = new Map();
   const indicators = document.createElement('span');
   indicators.className = 'preview-indicators';
@@ -34,7 +44,7 @@ for (const frame of document.querySelectorAll('.project-card .cover[data-preview
     if (!loaded.has(index)) {
       const slide = slides[index];
       const probe = new Image();
-      probe.sizes = image.sizes;
+      probe.sizes = slide.sizes || image.sizes;
       probe.srcset = slide.srcset;
       probe.src = slide.src;
       loaded.set(index, probe.decode().then(() => probe).catch(() => {
@@ -51,9 +61,30 @@ for (const frame of document.querySelectorAll('.project-card .cover[data-preview
     const ready = await load(index);
     // При быстром движении курсора поздний ответ не меняет уже выбранный кадр.
     if (!ready || wanted !== index) return;
+    stopFade();
+    const enabled = (document.documentElement?.dataset.animations || '').split(' ').includes('preview');
+    const previous = enabled && reducedMotion && !reducedMotion.matches && typeof image.animate === 'function'
+      ? image.cloneNode(false) : null;
+    if (previous) {
+      previous.classList.add('preview-previous');
+      previous.removeAttribute('id');
+      previous.alt = '';
+      previous.setAttribute('aria-hidden', 'true');
+    }
+    image.sizes = slides[index].sizes || image.sizes;
     image.srcset = slides[index].srcset;
     image.src = slides[index].src;
     image.alt = slides[index].alt;
+    if (previous) {
+      frame.append(previous);
+      const animation = previous.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease-out' });
+      const transition = { layer: previous, animation };
+      fade = transition;
+      animation.finished.catch(() => {}).finally(() => {
+        previous.remove();
+        if (fade === transition) fade = null;
+      });
+    }
     current = index;
     bars.forEach((bar, i) => bar.classList.toggle('is-current', i === index));
     if (announce) announcement.textContent = `Изображение ${index + 1} из ${slides.length}`;

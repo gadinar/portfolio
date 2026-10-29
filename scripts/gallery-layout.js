@@ -3,24 +3,43 @@
 function planGallery(ratios, width, seed = 0) {
   const small = width <= 620;
   const gap = small ? 14 : 20;
-  const targets = small ? [240, 180, 300] : [420, 275, 540];
+  // Первый кадр всегда главный, независимо от формата и числа изображений.
   const rows = [];
   let start = 0;
+  let pair = 0;
   while (start < ratios.length) {
-    const target = targets[(rows.length + seed) % targets.length];
-    let best;
-    for (let count = 1; count <= Math.min(small ? 2 : 3, ratios.length - start); count++) {
-      const group = ratios.slice(start, start + count);
-      const total = group.reduce((sum, ratio) => sum + ratio, 0);
-      const rowWidth = width;
-      const height = (rowWidth - gap * (count - 1)) / total;
-      if (count > 1 && Math.min(...group) * height < (small ? 120 : 150)) continue;
-      let score = Math.abs(Math.log(height / target));
-      if (ratios.length - start - count === 1) score += .7;
-      if (!best || score < best.score) best = { start, count, ratios: group, width: rowWidth, height, gap, score };
+    const remaining = ratios.length - start;
+    const count = small || start === 0 || remaining === 1 ? 1 : (remaining === 3 ? 3 : 2);
+    const group = ratios.slice(start, start + count);
+    let columns = [1];
+    let height;
+    if (count === 1) {
+      // На телефоне показываем фото целиком. Крупный кадр на компьютере компактнее.
+      height = small ? width / group[0] : (start === 0
+        ? Math.min(720, width / Math.min(2.4, Math.max(1.9, group[0])))
+        : Math.min(520, width / 2.8));
+    } else if (count === 3) {
+      const accents = [.42, .32, .26];
+      columns = accents.map((_, i) => accents[(i + seed) % 3]);
+      const natural = group.map((ratio, i) => (width - gap * 2) * columns[i] / ratio);
+      height = Math.max(width * .25, Math.min(width * .58, Math.exp(natural.reduce((sum, value) => sum + Math.log(value), 0) / 3)));
+    } else {
+      const accents = seed === 2 ? [1.3, .7] : [1.2, .8];
+      const phase = (pair + seed) % 2;
+      const weights = group.map((ratio, i) => ratio * accents[(i + phase) % 2]);
+      let fraction = Math.max(.36, Math.min(.64, weights[0] / (weights[0] + weights[1])));
+      if (Math.abs(fraction - .5) < .08) fraction = phase === 0 ? .6 : .4;
+      columns = [fraction, 1 - fraction];
+      const available = width - gap;
+      // Общая высота балансирует кадрирование обоих исходных форматов.
+      const natural = group.map((ratio, i) => available * columns[i] / ratio);
+      height = Math.max(width * .25, Math.min(width * .58, Math.sqrt(natural[0] * natural[1])));
+      pair++;
     }
-    rows.push(best);
-    start += best.count;
+    const widths = columns.map(weight => weight * (width - gap * (count - 1)));
+    rows.push({ start, count, ratios: group, width, gap, columns, widths,
+      height, heights: widths.map(() => height), frameRatios: widths.map(cellWidth => cellWidth / height) });
+    start += count;
   }
   return rows;
 }
@@ -48,12 +67,14 @@ function planGallery(ratios, width, seed = 0) {
     for (const row of planGallery(ratios, width, seed)) {
       const node = document.createElement('div');
       node.className = 'gallery-row';
-      node.style.setProperty('--gallery-columns', row.ratios.map(ratio => `minmax(0,${ratio}fr)`).join(' '));
+      node.style.setProperty('--gallery-columns', row.columns.map(weight => `minmax(0,${weight}fr)`).join(' '));
       node.style.setProperty('--row-gap', `${row.gap}px`);
       for (let i = row.start; i < row.start + row.count; i++) {
         const figure = figures[i];
         const image = figure.querySelector('img');
-        image.sizes = `${Math.ceil(row.height * ratios[i])}px`;
+        const cell = i - row.start;
+        figure.style.setProperty('--frame-ratio', String(row.frameRatios[cell]));
+        image.sizes = `${Math.ceil(Math.max(row.widths[cell], row.height * ratios[i]))}px`;
         node.append(figure);
       }
       fragment.append(node);
