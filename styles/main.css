@@ -105,13 +105,15 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
 }
 @media (max-width: 700px) {
   body { padding: 0 20px; }
-  .site-header { padding: 28px 0 36px; flex-direction: column; gap: 24px; }
-  .identity { font-size: 24px; }
-  .profile-description { margin-top: 12px; font-size: 14px; }
-  .contacts { display: flex; flex-wrap: nowrap; align-items: center; gap: clamp(14px, 4vw, 24px); max-width: 100%; }
+  .site-header { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; padding: 28px 0 36px; gap: 0 12px; }
+  .profile { display: contents; }
+  .identity { grid-column: 1 / -1; font-size: 24px; }
+  .profile-description { grid-column: 1 / -1; margin-top: 12px; font-size: 14px; }
+  .site-header .theme-toggle { grid-column: 1; grid-row: 3; margin-top: 16px; }
+  .contacts { display: flex; flex-wrap: nowrap; justify-content: flex-end; align-items: center; gap: clamp(8px, 2.5vw, 16px); max-width: 100%; padding-top: 0; }
   .contacts a { gap: 6px; min-height: 44px; white-space: nowrap; }
   .contacts .contact-icon { width: 18px; height: 18px; }
-  .header-aside { justify-items: start; width: 100%; }
+  .header-aside { grid-column: 2; grid-row: 3; justify-items: end; width: 100%; margin-top: 16px; }
   .project-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .category-filters { gap: 8px 18px; margin-bottom: 24px; }
   .category-filters button { font-size: 13px; }
