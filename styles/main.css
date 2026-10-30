@@ -108,8 +108,10 @@ h1 { font-weight: 400; font-size: clamp(36px, 4vw, 62px); line-height: 1.08; let
   .site-header { padding: 28px 0 36px; flex-direction: column; gap: 24px; }
   .identity { font-size: 24px; }
   .profile-description { margin-top: 12px; font-size: 14px; }
-  .contacts { gap: 9px; }
-  .header-aside { justify-items: start; }
+  .contacts { display: flex; flex-wrap: nowrap; align-items: center; gap: clamp(14px, 4vw, 24px); max-width: 100%; }
+  .contacts a { gap: 6px; min-height: 44px; white-space: nowrap; }
+  .contacts .contact-icon { width: 18px; height: 18px; }
+  .header-aside { justify-items: start; width: 100%; }
   .project-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .category-filters { gap: 8px 18px; margin-bottom: 24px; }
   .category-filters button { font-size: 13px; }
